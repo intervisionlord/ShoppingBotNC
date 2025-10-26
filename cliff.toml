@@ -13,7 +13,7 @@ body = """
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
-    {% for commit in commits %}
+    {% for commit in commits | unique(attribute="message") %}
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
             {{ commit.message | upper_first }} ( {{ commit.id }} )\
@@ -55,6 +55,11 @@ commit_preprocessors = [
     # Check spelling of the commit message using https://github.com/crate-ci/typos.
     # If the spelling is incorrect, it will be fixed automatically.
     #{ pattern = '.*', replace_command = 'typos --write-changes -' },
+    # Объединяем все README коммиты в один тип
+    { pattern = '^.*\\(README\\).*', replace = "docs: обновление документации" },
+    { pattern = '^.*\\(CHANGELOG\\).*', replace = "docs: обновление changelog" },
+    { pattern = '^.*[Rr]eadme.*', replace = "docs: обновление документации" },
+    { pattern = '^.*[Cc]hangelog.*', replace = "docs: обновление changelog" },
 ]
 # Prevent commits that are breaking from being excluded by commit parsers.
 protect_breaking_commits = false
