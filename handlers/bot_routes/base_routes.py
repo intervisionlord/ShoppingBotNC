@@ -1,5 +1,6 @@
-from aiogram import types, Router
-from aiogram.filters import CommandStart, Command
+from aiogram import Router, types
+from aiogram.filters import Command, CommandStart
+
 from handlers.handler_logging import logger
 
 # Создаем роутер для базовых команд бота

@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
-from handlers.handler_logging import logger
-from handlers.handler_bot import setup_webhook, close_bot_session, bot
+
+from fastapi import FastAPI, HTTPException, Request
+
 from config.settings import settings
 from core import create_application
+from handlers.handler_bot import bot, close_bot_session, setup_webhook
+from handlers.handler_logging import logger
 
 # Формируем URL вебхука
 WEBHOOK_PATH = "/webhook"
@@ -23,8 +25,6 @@ async def lifespan(app: FastAPI):
     if WEBHOOK_URL and WEBHOOK_URL.startswith("https://"):
         try:
             await setup_webhook(WEBHOOK_URL)
-            logger.info(f"Вебхук установлен: {WEBHOOK_URL}")
-
             if bot:
                 webhook_info = await bot.get_webhook_info()
                 logger.info(f"Статус вебхука: {webhook_info.url}")

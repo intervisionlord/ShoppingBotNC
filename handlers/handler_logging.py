@@ -13,16 +13,6 @@ logger.add(
     level="DEBUG",
 )
 
-# Пример цветовых тегов для уровня:
-#
-# TRACE - <blue>
-# DEBUG - <cyan>
-# INFO - <green>
-# SUCCESS - <green><bold>
-# WARNING - <yellow>
-# ERROR - <red>
-# CRITICAL - <red><bold>
-
 logger.level("DEBUG", color="<cyan>")
 logger.level("INFO", color="<green>")
 logger.level("SUCCESS", color="<green><bold>")

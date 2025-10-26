@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from routes.base_routes import base_router
-from routes.webhook_routes import webhook_router
+from routes.routes_base import base_router
+from routes.routes_webhook import webhook_router
 
 
 def create_application() -> FastAPI:

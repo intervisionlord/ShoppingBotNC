@@ -6,7 +6,9 @@ from handlers.bot_routes.base_routes import base_router
 from handlers.handler_logging import logger
 
 # Инициализация бота
-bot = Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
+bot = (  # pylint: disable=C0103:invalid-name
+    Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
+)
 dispatcher = Dispatcher()
 
 # Регистрируем роутеры бота

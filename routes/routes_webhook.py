@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request
 from handlers.handler_logging import logger
 from handlers.handler_bot import process_update
-from config.settings import settings
 
 # Создаем роутер для вебхука
 webhook_router = APIRouter(tags=["webhook"])
