@@ -20,7 +20,7 @@ WEBHOOK_URL = (
 async def lifespan(app: FastAPI):
     """Lifespan manager для управления событиями приложения"""
     # Startup
-    logger.info(f"Сервер запущен на {settings.HOST}:{settings.PORT}")
+    logger.success(f"Сервер запущен на {settings.HOST}:{settings.PORT}")
 
     if WEBHOOK_URL and WEBHOOK_URL.startswith("https://"):
         try:
