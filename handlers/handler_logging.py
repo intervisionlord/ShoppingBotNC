@@ -1,0 +1,31 @@
+import sys
+
+from loguru import logger
+
+logger.remove()
+logger.add(
+    sys.stderr,
+    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+    "<level>{level}</level> | "
+    "<cyan>{module}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+    "{message}",
+    colorize=True,
+    level="DEBUG",
+)
+
+# Пример цветовых тегов для уровня:
+#
+# TRACE - <blue>
+# DEBUG - <cyan>
+# INFO - <green>
+# SUCCESS - <green><bold>
+# WARNING - <yellow>
+# ERROR - <red>
+# CRITICAL - <red><bold>
+
+logger.level("DEBUG", color="<cyan>")
+logger.level("INFO", color="<green>")
+logger.level("SUCCESS", color="<green><bold>")
+logger.level("WARNING", color="<yellow><bold>")
+logger.level("ERROR", color="<red>")
+logger.level("CRITICAL", color="<red><bold>")
