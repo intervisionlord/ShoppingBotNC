@@ -1,4 +1,5 @@
-from fastapi import Request, HTTPException
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, HTTPException
 from handlers.handler_logging import logger
 from handlers.handler_bot import setup_webhook, close_bot_session, bot
 from config.settings import settings
@@ -12,12 +13,11 @@ WEBHOOK_URL = (
     else None
 )
 
-# Создаем приложение
-app = create_application()
 
-
-@app.on_event("startup")
-async def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan manager для управления событиями приложения"""
+    # Startup
     logger.info(f"Сервер запущен на {settings.HOST}:{settings.PORT}")
 
     if WEBHOOK_URL and WEBHOOK_URL.startswith("https://"):
@@ -37,11 +37,16 @@ async def on_startup():
     else:
         logger.warning("Вебхук не настроен (требуется HTTPS)")
 
+    yield
 
-@app.on_event("shutdown")
-async def on_shutdown():
+    # Shutdown
     await close_bot_session()
     logger.info("Сервер остановлен")
+
+
+# Создаем приложение с lifespan
+app = create_application()
+app.router.lifespan_context = lifespan
 
 
 @app.api_route(
