@@ -1,9 +1,24 @@
-# ShoppingBotNC - Модульный Telegram Бот
+# 🛒 ShoppingBotNC - Модульный Telegram Бот
 
-* **🏷️ Версия:** `0.0.1`
-* **📋 [CHANGELOG](CHANGELOG.md)**
+<center>
+
+[![Pylint](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml)
+![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+![Last Commit](https://img.shields.io/github/last-commit/intervisionlord/ShoppingBotNC)
+
+![Aiogram](https://img.shields.io/badge/aiogram-3.x-00aced?logo=telegram&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.120.0-009688?logo=fastapi&logoColor=white)
+![Loguru](https://img.shields.io/badge/loguru-0.7.3-4B275F)
+
+![License](https://img.shields.io/badge/license-GPL3-blue)
+[![](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/intervisionlord/ShoppingBotNC)
+
+</center>
 
 Минимально рабочая версия каркаса для будущего Telegram бота с модульной архитектурой на Python.
+
+* ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/intervisionlord/ShoppingBotNC)
+* **📋 [CHANGELOG](CHANGELOG.md)**
 
 ---
 - [🚀 Особенности](#-особенности)
