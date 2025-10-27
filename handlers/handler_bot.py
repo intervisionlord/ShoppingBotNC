@@ -3,6 +3,7 @@ from aiogram.types import Update
 
 from config.settings import settings
 from handlers.bot_routes.base_routes import base_router
+from handlers.bot_routes.nc_deck_routes import nc_deck_router
 from handlers.handler_logging import logger
 
 # Инициализация бота
@@ -13,6 +14,7 @@ dispatcher = Dispatcher()
 
 # Регистрируем роутеры бота
 dispatcher.include_router(base_router)
+dispatcher.include_router(nc_deck_router)
 
 logger.info("Бот инициализирован")
 

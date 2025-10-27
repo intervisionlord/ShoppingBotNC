@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     # Настройки вебхука (опционально для продакшена)
     WEBHOOK_HOST: Optional[str] = Field(None, description="Публичный URL для вебхука")
 
+    # Настройки NextCloud
+    NC_URL: Optional[str] = Field(None, description="Адрес Nextcloud")
+    NC_LOGIN: Optional[str] = Field(None, description="Логин Nextcloud")
+    NC_PASSWORD: Optional[str] = Field(None, description="Пароль Nextcloud")
+
     # Настройки логирования
     LOG_LEVEL: str = Field("INFO", description="Уровень логирования")
 
