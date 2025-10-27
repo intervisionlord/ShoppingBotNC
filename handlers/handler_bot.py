@@ -1,3 +1,5 @@
+"""Основной хендлер бота"""
+
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
@@ -19,8 +21,14 @@ dispatcher.include_router(nc_deck_router)
 logger.info("Бот инициализирован")
 
 
-async def process_update(update_data: dict):
-    """Обработка обновления от Telegram"""
+async def process_update(update_data: dict) -> None:
+    """
+    Обработка обновления от Telegram
+
+    :param update_data: Обновление от телеграм
+    :type update_data: dict
+    """
+
     if not bot:
         logger.warning("Получено обновление, но бот не инициализирован")
         return
@@ -29,8 +37,13 @@ async def process_update(update_data: dict):
     await dispatcher.feed_webhook_update(bot, tg_update)
 
 
-async def setup_webhook(webhook_url: str):
-    """Настройка вебхука"""
+async def setup_webhook(webhook_url: str) -> None:
+    """
+    Настройка вебхука
+
+    :param webhook_url: Передаваемый вебхук
+    :type webhook_url: str
+    """
     if not bot:
         logger.warning("Попытка настроить вебхук без бота")
         return
@@ -40,7 +53,7 @@ async def setup_webhook(webhook_url: str):
     logger.info(f"Вебхук установлен: {webhook_url}")
 
 
-async def close_bot_session():
+async def close_bot_session() -> None:
     """Закрытие сессии бота"""
     if bot:
         await bot.session.close()
