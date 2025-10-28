@@ -1,43 +1,58 @@
-import asyncio
-from httpx import (
-    AsyncClient,
-    BasicAuth,
-    HTTPStatusError,
-    ConnectError,
-    ConnectTimeout,
-    ReadTimeout,
-    NetworkError,
-)
+"""Обработчик получения досок и данных в них"""
+
+from typing import List, Optional
+
+from pydantic import ValidationError
+
 from config.settings import settings
 from handlers.handler_logging import logger
+from handlers.handler_requests import send_request
+from models.model_board import ModelBoard
+from models.model_stack import ModelStack
+
+DECK_ENDPOINT = "/apps/deck/api/v1.0/boards"
 
 
-headers = {
-    "OCS-APIRequest": "true",
-    "accept": "application/json",
-}
+async def get_boards() -> Optional[List[ModelBoard]]:
+    """
+    Получение всех Дэк
 
-auth = BasicAuth(username=settings.NC_LOGIN, password=settings.NC_PASSWORD)
-
-DECK_ENDPOINT = "/apps/deck/api/v1.0"
-
-
-async def get_decks_in_workspace():
-    BOARD_ENDPOINT = f"{settings.NC_URL}{DECK_ENDPOINT}/boards"
-    async with AsyncClient(auth=auth, headers=headers) as client:
+    :return: JSON со списком Дэк
+    :rtype: List[ModelBoard] | None
+    """
+    boards_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}"
+    decklist = await send_request(url=boards_endpoint, method="GET")
+    if decklist is not None:
         try:
-            response = await client.get(url=BOARD_ENDPOINT)
-            response.raise_for_status()
-        except HTTPStatusError as err:
-            logger.error(f"Ошибка статуса: {err}")
-        except ConnectError:
-            logger.error(
-                f"Не удалось установить соединение с сервером {settings.NC_URL}"
-            )
-        except ConnectTimeout:
-            logger.error(f"Таймаут от сервера {settings.NC_URL}")
-        except ReadTimeout:
-            logger.error(f"Таймаут при чтении ответа {settings.NC_URL}")
-        except NetworkError as err:
-            logger.error(f"Ошибка сети: {err}")
-    return response.json()
+            decks = [ModelBoard(**deck) for deck in decklist]
+            return decks
+        except ValidationError as err:
+            logger.critical(f"Получены невалидные данные: {err}")
+    else:
+        logger.critical("Данные по доскам не получены")
+    return None
+
+
+async def get_stacks(board_id: int) -> Optional[List[ModelStack]]:
+    """
+    Получение стеков в доске
+
+    :param board_id: ID доски
+    :type board_id: int
+    :return: Список стеков в доске
+    :rtype: List[ModelStack] | None
+    """
+    if board_id is not None:
+        stacks_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}/{board_id}/stacks"
+        stacklist = await send_request(url=stacks_endpoint, method="GET")
+        if stacklist is not None:
+            try:
+                stacks = [ModelStack(**stack) for stack in stacklist]
+                return stacks
+            except ValidationError as err:
+                logger.critical(f"Получены невалидные данные: {err}")
+        else:
+            logger.critical("Данные по стекам не получены")
+    else:
+        logger.critical('"board_id" не задан')
+    return None

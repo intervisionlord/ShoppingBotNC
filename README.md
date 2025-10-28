@@ -1,10 +1,11 @@
 # 🛒 ShoppingBotNC - Модульный Telegram Бот
 
-<center>
+<p align="center">
 
-[![Pylint](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/intervisionlord/ShoppingBotNC)
+[![Pylint](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=intervisionlord_ShoppingBotNC&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=intervisionlord_ShoppingBotNC)
 
 ![Aiogram](https://img.shields.io/badge/aiogram-3.x-00aced?logo=telegram&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.120.0-009688?logo=fastapi&logoColor=white)
@@ -13,7 +14,7 @@
 ![License](https://img.shields.io/badge/license-GPL3-blue)
 [![](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/intervisionlord/ShoppingBotNC)
 
-</center>
+</p>
 
 Минимально рабочая версия каркаса для будущего Telegram бота с модульной архитектурой на Python.
 
@@ -32,6 +33,7 @@
 - [🌐 API Эндпоинты](#-api-эндпоинты)
 - [🔧 Конфигурация](#-конфигурация)
     - [SSL настройки](#ssl-настройки)
+    - [NextCloud Deck настройки](#nextcloud-deck-настройки)
 - [🚀 Развертывание](#-развертывание)
     - [Локальная разработка](#локальная-разработка)
     - [Продакшен с Docker](#продакшен-с-docker)
@@ -52,22 +54,34 @@
 
 ## 📁 Структура проекта
 
-```
-├── config/
-│   └── settings.py          # Конфигурация приложения
-├── handlers/
-│   ├── handler_bot.py       # Инициализация бота и диспетчера
-│   ├── handler_logging.py   # Настройка логирования
-│   ├── handler_server.py    # Настройка сервера
-│   └── bot_routes/
-│       ├── __init__.py
-│       └── base_routes.py   # Базовые команды бота
-├── routes/
-│   ├── routes_base.py       # Базовые API эндпоинты
-│   └── routes_webhook.py    # Webhook эндпоинты
-├── core.py                  # Создание FastAPI приложения
-├── main.py                  # Точка входа
-└── .env.example             # Пример файла конфигурации
+```text
+├── .env.example                    # Пример конфигурации
+├── CHANGELOG.md
+├── config
+│   └── settings.py                 # Обработчик конфигурации
+├── core.py                         # Основной файл FastAPI
+├── handlers                        # Обработчики бота и логики
+│   ├── bot_routes                  # Роуты команд бота
+│   │   ├── __init__.py
+│   │   ├── route_deck_boards.py
+│   │   ├── route_deck_cards.py
+│   │   ├── route_deck_stacks.py
+│   │   └── routes_deck.py
+│   ├── handler_bot.py
+│   ├── handler_logging.py
+│   ├── handler_nc_deck.py
+│   ├── handler_requests.py
+│   └── handler_server.py
+├── LICENSE
+├── main.py                         # Файл запуска приложения
+├── models                          # Модели данных
+│   ├── model_board.py
+│   └── model_stack.py
+├── README.md
+├── requirements.txt                # Зависимости Python
+└── routes                          # Роуты FastAPI
+    ├── routes_base.py
+    └── routes_webhook.py
 ```
 
 ## ⚙️ Быстрый старт
@@ -107,12 +121,13 @@ python main.py
 ```
 
 ## 🛠 Команды бота
-
 * **/start** - Запуск бота
 * **/help** - Список команд
 * **/test** - Тестовая команда
 * **/about** - О боте
 * **test** (текстовое сообщение) - Проверка текстовых хендлеров
+
+* **/decks** - Показать список досок NextCloud Deck
 
 ## 🌐 API Эндпоинты
 
@@ -136,6 +151,15 @@ SSL_ENABLED=True
 SSL_ENABLED=True
 SSL_KEY_PATH="./private.key"
 SSL_CERT_PATH="./certificate.crt"
+```
+
+### NextCloud Deck настройки
+
+Для работы с NextCloud Deck укажите:
+```shell
+NC_URL="https://your-nextcloud-domain.com"
+NC_LOGIN="your_username"
+NC_PASSWORD="your_password_or_app_token"
 ```
 
 ## 🚀 Развертывание

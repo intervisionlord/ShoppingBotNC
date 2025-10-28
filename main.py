@@ -1,3 +1,5 @@
+"""Точка входа приложения"""
+
 import os
 
 import uvicorn

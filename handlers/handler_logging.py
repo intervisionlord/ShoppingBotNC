@@ -1,3 +1,5 @@
+"""Обработчик логирования"""
+
 import sys
 
 from loguru import logger

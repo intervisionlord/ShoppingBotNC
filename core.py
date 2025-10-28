@@ -1,3 +1,5 @@
+"""Создание и конфигурация FastAPI приложения"""
+
 from fastapi import FastAPI
 
 from config.settings import settings
