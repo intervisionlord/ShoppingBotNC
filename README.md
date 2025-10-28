@@ -1,10 +1,11 @@
 # 🛒 ShoppingBotNC - Модульный Telegram Бот
 
-<center>
+<p align="center">
 
-[![Pylint](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/intervisionlord/ShoppingBotNC)
+[![Pylint](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/intervisionlord/ShoppingBotNC/actions/workflows/pylint.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=intervisionlord_ShoppingBotNC&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=intervisionlord_ShoppingBotNC)
 
 ![Aiogram](https://img.shields.io/badge/aiogram-3.x-00aced?logo=telegram&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.120.0-009688?logo=fastapi&logoColor=white)
@@ -13,7 +14,7 @@
 ![License](https://img.shields.io/badge/license-GPL3-blue)
 [![](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/intervisionlord/ShoppingBotNC)
 
-</center>
+</p>
 
 Минимально рабочая версия каркаса для будущего Telegram бота с модульной архитектурой на Python.
 
