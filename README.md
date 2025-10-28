@@ -53,21 +53,31 @@
 ## 📁 Структура проекта
 
 ```
-├── config/
-│   └── settings.py          # Конфигурация приложения
-├── handlers/
-│   ├── handler_bot.py       # Инициализация бота и диспетчера
-│   ├── handler_logging.py   # Настройка логирования
-│   ├── handler_server.py    # Настройка сервера
-│   └── bot_routes/
-│       ├── __init__.py
-│       └── base_routes.py   # Базовые команды бота
-├── routes/
-│   ├── routes_base.py       # Базовые API эндпоинты
-│   └── routes_webhook.py    # Webhook эндпоинты
-├── core.py                  # Создание FastAPI приложения
-├── main.py                  # Точка входа
-└── .env.example             # Пример файла конфигурации
+
+├── .env.example                # Пример Конфигурации
+├── CHANGELOG.md
+├── config
+│   └── settings.py             # Настройки приложения
+├── core.py                     # Ядро бота
+├── handlers                    # Обработчики
+│   ├── bot_routes              # Обработчики команд бота
+│   │   ├── __init__.py
+│   │   ├── base_routes.py      # Основноые команды
+│   │   └── nc_deck_routes.py   # Команды для NC Deck
+│   ├── handler_bot.py          # Основной хендлер бота
+│   ├── handler_logging.py      # Логирование
+│   ├── handler_nc_deck.py      # Получение досок NC
+│   ├── handler_requests.py     # Отправка запросов в NC
+│   └── handler_server.py       # Сервер API
+├── LICENSE
+├── main.py                     # Основной файл запуска
+├── models                      # Модели данных
+│   └── model_board.py          # Модель досок
+├── README.md
+├── requirements.txt            # Зависимости
+└── routes
+    ├── routes_base.py          # Основные роуты FastAPI
+    └── routes_webhook.py       # Роуты вебхука
 ```
 
 ## ⚙️ Быстрый старт
