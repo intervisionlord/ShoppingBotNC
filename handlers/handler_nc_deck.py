@@ -10,7 +10,7 @@ from handlers.handler_requests import send_request
 from models.model_board import ModelBoard
 from models.model_stack import ModelStack
 
-DECK_ENDPOINT = "/apps/deck/api/v1.0"
+DECK_ENDPOINT = "/apps/deck/api/v1.0/boards"
 
 
 async def get_boards() -> Optional[List[ModelBoard]]:
@@ -20,7 +20,7 @@ async def get_boards() -> Optional[List[ModelBoard]]:
     :return: JSON со списком Дэк
     :rtype: List[ModelBoard] | None
     """
-    boards_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}/boards"
+    boards_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}"
     decklist = await send_request(url=boards_endpoint, method="GET")
     if decklist is not None:
         try:
