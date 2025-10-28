@@ -8,10 +8,10 @@ from handlers.bot_routes.routes_deck import nc_deck_router
 from handlers.handler_logging import logger
 
 # Инициализация бота
-bot = Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
+BOT_INSTANCE = Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
 dispatcher = Dispatcher()
 
-# Главный роутер Deck
+# Главный роутер
 dispatcher.include_router(nc_deck_router)
 
 logger.info("Бот инициализирован")
@@ -24,12 +24,12 @@ async def process_update(update_data: dict) -> None:
     :param update_data: Описание
     :type update_data: dict
     """
-    if not bot:
+    if not BOT_INSTANCE:
         logger.warning("Получено обновление, но бот не инициализирован")
         return
 
     tg_update = Update(**update_data)
-    await dispatcher.feed_webhook_update(bot, tg_update)
+    await dispatcher.feed_webhook_update(BOT_INSTANCE, tg_update)
 
 
 async def setup_webhook(webhook_url: str) -> None:
@@ -39,12 +39,12 @@ async def setup_webhook(webhook_url: str) -> None:
     :param webhook_url: Описание
     :type webhook_url: str
     """
-    if not bot:
+    if not BOT_INSTANCE:
         logger.warning("Попытка настроить вебхук без бота")
         return
 
-    await bot.delete_webhook()
-    await bot.set_webhook(webhook_url)
+    await BOT_INSTANCE.delete_webhook()
+    await BOT_INSTANCE.set_webhook(webhook_url)
     logger.info(f"Вебхук установлен: {webhook_url}")
 
 
@@ -52,5 +52,5 @@ async def close_bot_session() -> None:
     """
     Закрытие сессии бота
     """
-    if bot:
-        await bot.session.close()
+    if BOT_INSTANCE:
+        await BOT_INSTANCE.session.close()

@@ -34,11 +34,12 @@ class Settings(BaseSettings):
     # Настройки логирования
     LOG_LEVEL: str = Field("INFO", description="Уровень логирования")
 
-    class Config:
+    class Config:  # pylint: disable=R0903
+        """Конфигурация Pydantic"""
+
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
 
 
-# Создаем глобальный экземпляр настроек
 settings = Settings()

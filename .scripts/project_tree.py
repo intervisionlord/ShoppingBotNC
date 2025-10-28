@@ -8,6 +8,11 @@ def print_tree(directory: Path, ignore_dirs: list[str] = None, prefix: str = "")
     """
     Рекурсивно выводит древовидную структуру папок и файлов,
     игнорируя указанные директории.
+
+    :param directory: Директория для отображения
+    :param ignore_dirs: Список директорий для игнорирования
+    :param prefix: Префикс для отступов
+    :return: Генератор строк с древовидной структурой
     """
     ignore_dirs = [] if ignore_dirs is None else ignore_dirs
     space = "    "

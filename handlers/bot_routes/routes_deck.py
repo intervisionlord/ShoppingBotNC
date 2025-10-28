@@ -109,7 +109,7 @@ async def decks_handler(message: types.Message) -> None:
 @nc_deck_router.callback_query(NavigationCallback.filter(F.screen == "stacks_list"))
 async def stacks_handler(
     callback: types.CallbackQuery, callback_data: NavigationCallback
-):
+) -> None:
     """
     Обработчик выбора доски
 
@@ -124,7 +124,7 @@ async def stacks_handler(
 @nc_deck_router.callback_query(NavigationCallback.filter(F.screen == "boards_list"))
 async def boards_handler(
     callback: types.CallbackQuery, callback_data: NavigationCallback
-):
+) -> None:
     """
     Обработчик возврата к доскам
 
@@ -133,13 +133,14 @@ async def boards_handler(
     :param callback_data: Callback данные
     :type callback_data: NavigationCallback
     """
+    del callback_data
     await back_to_boards_list(callback)
 
 
 @nc_deck_router.callback_query(NavigationCallback.filter(F.screen == "cards_list"))
 async def cards_handler(
     callback: types.CallbackQuery, callback_data: NavigationCallback
-):
+) -> None:
     """
     Обработчик выбора стека
 
