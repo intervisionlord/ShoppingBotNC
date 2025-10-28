@@ -1,11 +1,13 @@
 """Отрисовка файловой структуры проекта"""
 
+import argparse
 from pathlib import Path
 
 
 def print_tree(directory: Path, ignore_dirs: list[str] = None, prefix: str = ""):
     """
-    Рекурсивно выводит древовидную структуру папок и файлов, игнорируя указанные директории.
+    Рекурсивно выводит древовидную структуру папок и файлов,
+    игнорируя указанные директории.
     """
     ignore_dirs = [] if ignore_dirs is None else ignore_dirs
     space = "    "
@@ -30,9 +32,37 @@ def print_tree(directory: Path, ignore_dirs: list[str] = None, prefix: str = "")
             yield from print_tree(path, ignore_dirs, prefix=prefix + extension)
 
 
-if __name__ == "__main__":
-    ignore_list = ["__pycache__", ".venv", ".git"]
-    path_to_display = Path(".")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Отображение древовидной структуры проекта"
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Директория для отображения (по умолчанию: текущая)",
+    )
+    parser.add_argument(
+        "-i",
+        "--ignore",
+        nargs="+",
+        default=["__pycache__", ".venv", ".git"],
+        help="Директории для игнорирования (через пробел)",
+    )
+
+    args = parser.parse_args()
+
+    path_to_display = Path(args.directory)
+    ignore_list = args.ignore
+
+    print(f"Структура: {path_to_display.absolute()}")
+    print(f"Игнорируемые директории: {', '.join(ignore_list)}")
+    print()
+
     print(path_to_display.name)
     for line in print_tree(path_to_display, ignore_dirs=ignore_list):
         print(line)
+
+
+if __name__ == "__main__":
+    main()
