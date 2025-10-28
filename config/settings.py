@@ -1,3 +1,5 @@
+"""Файл настроек приложения"""
+
 from typing import Optional
 
 from pydantic import Field
@@ -7,7 +9,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Конфигурация приложения"""
 
-    VERSION: str = Field("0.0.1.0")
+    VERSION: str = Field("0.0.2.2")
 
     # Токен бота Telegram
     BOT_TOKEN: Optional[str] = Field(None, description="Токен бота от @BotFather")

@@ -25,4 +25,4 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        # проверяет стиль кода Python
+        args: [--max-line-length=88]
