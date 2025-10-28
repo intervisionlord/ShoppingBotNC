@@ -1,43 +1,32 @@
-import asyncio
-from httpx import (
-    AsyncClient,
-    BasicAuth,
-    HTTPStatusError,
-    ConnectError,
-    ConnectTimeout,
-    ReadTimeout,
-    NetworkError,
-)
+"""Обработчик получения досок"""
+
+from typing import List, Optional
+
+from pydantic import ValidationError
+
 from config.settings import settings
 from handlers.handler_logging import logger
-
-
-headers = {
-    "OCS-APIRequest": "true",
-    "accept": "application/json",
-}
-
-auth = BasicAuth(username=settings.NC_LOGIN, password=settings.NC_PASSWORD)
+from handlers.handler_requests import send_request
+from models.model_board import ModelBoard
 
 DECK_ENDPOINT = "/apps/deck/api/v1.0"
 
 
-async def get_decks_in_workspace():
-    BOARD_ENDPOINT = f"{settings.NC_URL}{DECK_ENDPOINT}/boards"
-    async with AsyncClient(auth=auth, headers=headers) as client:
+async def get_decks() -> Optional[List[ModelBoard]]:
+    """
+    Получение всех Дэк
+
+    :return: JSON со списком Дэк
+    :rtype: List[ModelBoard] | None
+    """
+    boards_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}/boards"
+    decklist = await send_request(url=boards_endpoint, method="GET")
+    if decklist is not None:
         try:
-            response = await client.get(url=BOARD_ENDPOINT)
-            response.raise_for_status()
-        except HTTPStatusError as err:
-            logger.error(f"Ошибка статуса: {err}")
-        except ConnectError:
-            logger.error(
-                f"Не удалось установить соединение с сервером {settings.NC_URL}"
-            )
-        except ConnectTimeout:
-            logger.error(f"Таймаут от сервера {settings.NC_URL}")
-        except ReadTimeout:
-            logger.error(f"Таймаут при чтении ответа {settings.NC_URL}")
-        except NetworkError as err:
-            logger.error(f"Ошибка сети: {err}")
-    return response.json()
+            decks = [ModelBoard(**deck) for deck in decklist]
+            return decks
+        except ValidationError as err:
+            logger.critical(f"Получены невалидные данные: {err}")
+    else:
+        logger.critical("Данные не получены")
+    return None
