@@ -33,6 +33,7 @@
 - [🌐 API Эндпоинты](#-api-эндпоинты)
 - [🔧 Конфигурация](#-конфигурация)
     - [SSL настройки](#ssl-настройки)
+    - [NextCloud Deck настройки](#nextcloud-deck-настройки)
 - [🚀 Развертывание](#-развертывание)
     - [Локальная разработка](#локальная-разработка)
     - [Продакшен с Docker](#продакшен-с-docker)
@@ -53,32 +54,34 @@
 
 ## 📁 Структура проекта
 
-```
-
-├── .env.example                # Пример Конфигурации
+```text
+├── .env.example                    # Пример конфигурации
 ├── CHANGELOG.md
 ├── config
-│   └── settings.py             # Настройки приложения
-├── core.py                     # Ядро бота
-├── handlers                    # Обработчики
-│   ├── bot_routes              # Обработчики команд бота
+│   └── settings.py                 # Обработчик конфигурации
+├── core.py                         # Основной файл FastAPI
+├── handlers                        # Обработчики бота и логики
+│   ├── bot_routes                  # Роуты команд бота
 │   │   ├── __init__.py
-│   │   ├── base_routes.py      # Основноые команды
-│   │   └── nc_deck_routes.py   # Команды для NC Deck
-│   ├── handler_bot.py          # Основной хендлер бота
-│   ├── handler_logging.py      # Логирование
-│   ├── handler_nc_deck.py      # Получение досок NC
-│   ├── handler_requests.py     # Отправка запросов в NC
-│   └── handler_server.py       # Сервер API
+│   │   ├── route_deck_boards.py
+│   │   ├── route_deck_cards.py
+│   │   ├── route_deck_stacks.py
+│   │   └── routes_deck.py
+│   ├── handler_bot.py
+│   ├── handler_logging.py
+│   ├── handler_nc_deck.py
+│   ├── handler_requests.py
+│   └── handler_server.py
 ├── LICENSE
-├── main.py                     # Основной файл запуска
-├── models                      # Модели данных
-│   └── model_board.py          # Модель досок
+├── main.py                         # Файл запуска приложения
+├── models                          # Модели данных
+│   ├── model_board.py
+│   └── model_stack.py
 ├── README.md
-├── requirements.txt            # Зависимости
-└── routes
-    ├── routes_base.py          # Основные роуты FastAPI
-    └── routes_webhook.py       # Роуты вебхука
+├── requirements.txt                # Зависимости Python
+└── routes                          # Роуты FastAPI
+    ├── routes_base.py
+    └── routes_webhook.py
 ```
 
 ## ⚙️ Быстрый старт
@@ -118,12 +121,13 @@ python main.py
 ```
 
 ## 🛠 Команды бота
-
 * **/start** - Запуск бота
 * **/help** - Список команд
 * **/test** - Тестовая команда
 * **/about** - О боте
 * **test** (текстовое сообщение) - Проверка текстовых хендлеров
+
+* **/decks** - Показать список досок NextCloud Deck
 
 ## 🌐 API Эндпоинты
 
@@ -147,6 +151,15 @@ SSL_ENABLED=True
 SSL_ENABLED=True
 SSL_KEY_PATH="./private.key"
 SSL_CERT_PATH="./certificate.crt"
+```
+
+### NextCloud Deck настройки
+
+Для работы с NextCloud Deck укажите:
+```shell
+NC_URL="https://your-nextcloud-domain.com"
+NC_LOGIN="your_username"
+NC_PASSWORD="your_password_or_app_token"
 ```
 
 ## 🚀 Развертывание
