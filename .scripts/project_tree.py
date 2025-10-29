@@ -37,7 +37,10 @@ def print_tree(directory: Path, ignore_dirs: list[str] = None, prefix: str = "")
             yield from print_tree(path, ignore_dirs, prefix=prefix + extension)
 
 
-def main():
+def main() -> None:
+    """
+    Основная функция запуска отрисовки дерева файлов
+    """
     parser = argparse.ArgumentParser(
         description="Отображение древовидной структуры проекта"
     )
