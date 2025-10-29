@@ -1,40 +1,21 @@
-from pydantic import BaseModel
+"""Модели данных для досок NextCloud Deck"""
+
 from typing import Dict, List, Optional, Union
 
-# TODO: Референсные данные - удалить после тестов
-# "title": "Board title",
-# "owner": {
-#     "primaryKey": "admin",
-#     "uid": "admin",
-#     "displayname": "Administrator"
-# },
-# "color": "ff0000",
-# "archived": false,
-# "labels": [],
-# "acl": [],
-# "permissions": {
-#     "PERMISSION_READ": true,
-#     "PERMISSION_EDIT": true,
-#     "PERMISSION_MANAGE": true,
-#     "PERMISSION_SHARE": true
-# },
-# "users": [],
-# "shared": 0,
-# "deletedAt": 0,
-# "id": 10,
-# "lastModified": 1586269585,
-# "settings": {
-#     "notify-due": "off",
-#     "calendar": true
+from pydantic import BaseModel
 
 
 class Owner(BaseModel):
+    """Модель владельца доски"""
+
     primaryKey: str
     uid: str
     displayname: str
 
 
 class Permissions(BaseModel):
+    """Модель разрешений доски"""
+
     PERMISSION_READ: bool
     PERMISSION_EDIT: bool
     PERMISSION_MANAGE: bool
@@ -42,11 +23,15 @@ class Permissions(BaseModel):
 
 
 class Settings(BaseModel):
+    """Модель настроек доски"""
+
     notify_due: str
     calendar: bool
 
 
 class ModelBoard(BaseModel):
+    """Основная модель доски"""
+
     title: str
     owner: Owner
     color: str

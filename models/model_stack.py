@@ -1,17 +1,13 @@
+"""Модели данных для стеков NextCloud Deck"""
+
 from typing import List, Optional
 
 from pydantic import BaseModel
 
-# "title": "ToDo",
-# "boardId": 2,
-# "deletedAt": 0,
-# "lastModified": 1541426139,
-# "cards": [...],
-# "order": 999,
-# "id": 4
-
 
 class ModelStack(BaseModel):
+    """Модель стека карточек"""
+
     title: str
     boardId: int
     deletedAt: int
