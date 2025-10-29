@@ -21,7 +21,7 @@ async def process_update(update_data: dict) -> None:
     """
     Обработка обновления от Telegram
 
-    :param update_data: Описание
+    :param update_data: Полученное обновление от Telegram
     :type update_data: dict
     """
     if not BOT_INSTANCE:
@@ -36,7 +36,7 @@ async def setup_webhook(webhook_url: str) -> None:
     """
     Настройка вебхука
 
-    :param webhook_url: Описание
+    :param webhook_url: Адрес вебхука бота
     :type webhook_url: str
     """
     if not BOT_INSTANCE:
