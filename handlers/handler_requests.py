@@ -1,8 +1,8 @@
 """Обработчик отправки запросов к серверу NextCloud"""
 
 from typing import Any, Dict, Optional
-
-from httpx import AsyncClient, BasicAuth, RequestError
+import json
+from httpx import AsyncClient, BasicAuth, HTTPStatusError, RequestError
 
 from config.settings import settings
 from handlers.handler_logging import logger
@@ -10,36 +10,47 @@ from handlers.handler_logging import logger
 headers = {
     "OCS-APIRequest": "true",
     "accept": "application/json",
+    "Content-Type": "application/json",
 }
 auth = BasicAuth(username=settings.NC_LOGIN, password=settings.NC_PASSWORD)
 
 
-async def send_request(url: str, method: str) -> Optional[Dict[Any, Any]]:
-    """
-    Клиент для отправки запросов в API NextCloud
-
-    :param url: Полный адрес вебхука куда отправляются данные
-    :type url: str
-    :param method: Используемый метод (пока GET / POST)
-    :type method: str
-    :return: JSON ответа от сервера
-    :rtype: Dict[Any, Any] | None
-    """
+async def send_request(
+    url: str, method: str, data: Optional[Dict] = None
+) -> Optional[Dict[Any, Any]]:
+    """Клиент для отправки запросов в API NextCloud"""
     if not url:
-        logger.critical("Не определен URL!")
+        logger.error("Не определен URL!")
         return None
-    async with AsyncClient(auth=auth, headers=headers) as client:
+
+    async with AsyncClient(auth=auth, headers=headers, timeout=30.0) as client:
         try:
-            match method.upper():
-                case "GET":
-                    response = await client.get(url=url)
-                case "POST":
-                    response = await client.post(url=url)
-                case _:
-                    logger.critical(f"Неподдерживаемый метод: {method}")
-                    return None
+            method_upper = method.upper()
+            if method_upper == "GET":
+                response = await client.get(url=url)
+            elif method_upper == "POST":
+                response = await client.post(url=url, json=data)
+            elif method_upper == "PUT":
+                response = await client.put(url=url, json=data)
+            elif method_upper == "DELETE":
+                response = await client.delete(url=url)
+            else:
+                logger.error(f"Неподдерживаемый метод: {method}")
+                return None
+
             response.raise_for_status()
-            return response.json()
+
+            # Пытаемся прочитать ответ как JSON
+            try:
+                return response.json()
+            except json.JSONDecodeError as e:
+                logger.error(f"Ошибка декодирования JSON от {url}: {e}")
+                logger.error(f"Response text: {response.text}")
+                return None
+            except HTTPStatusError as e:
+                logger.error(f"Неожиданная ошибка при обработке ответа от {url}: {e}")
+                return None
+
         except RequestError as err:
-            logger.critical(f'Ошибка запроса к "{settings.NC_URL}": {err}')
-    return None
+            logger.error(f'Ошибка запроса к "{url}": {err}')
+            return None
