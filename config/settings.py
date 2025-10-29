@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Конфигурация приложения"""
 
-    VERSION: str = Field("0.0.2.2")
+    VERSION: str = Field("0.0.3.0")
 
     # Токен бота Telegram
     BOT_TOKEN: Optional[str] = Field(None, description="Токен бота от @BotFather")
@@ -26,10 +26,14 @@ class Settings(BaseSettings):
     # Настройки вебхука (опционально для продакшена)
     WEBHOOK_HOST: Optional[str] = Field(None, description="Публичный URL для вебхука")
 
-    # Настройки NextCloud
+    # Настройки NextCloud Deck
     NC_URL: Optional[str] = Field(None, description="Адрес Nextcloud")
     NC_LOGIN: Optional[str] = Field(None, description="Логин Nextcloud")
     NC_PASSWORD: Optional[str] = Field(None, description="Пароль Nextcloud")
+
+    # ID доски и стека для списка покупок
+    DECK_BOARD_ID: int = Field(1, description="ID доски для списка покупок")
+    DECK_STACK_ID: int = Field(1, description="ID стека для списка покупок")
 
     # Настройки логирования
     LOG_LEVEL: str = Field("INFO", description="Уровень логирования")
