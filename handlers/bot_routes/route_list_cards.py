@@ -6,17 +6,23 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from handlers.handler_logging import logger
 from handlers.handler_nc_deck import get_shopping_cards
-from handlers.bot_routes.route_states import CardCallback
+from handlers.bot_routes.states import CardCallback
 
 list_router = Router()
+
+MAX_TITLE_LENGTH = 30
 
 
 @list_router.message(CommandStart())
 @list_router.message(Command("help"))
 async def start_help_handler(message: types.Message) -> None:
-    """Обработчик команд /start и /help"""
-    help_text = """
-🛒 Бот для списка покупок
+    """
+    Обработчик команд /start и /help
+
+    :param message: Входящее сообщение
+    :type message: types.Message
+    """
+    help_text = """🛒 Бот для списка покупок
 
 Команды:
 /list - Показать список покупок
@@ -29,10 +35,16 @@ async def start_help_handler(message: types.Message) -> None:
 
 @list_router.message(Command("list"))
 async def list_handler(message: types.Message) -> None:
-    """Показать список покупок в виде инлайн кнопок"""
-    logger.info(f"Пользователь {message.from_user.id} запросил список покупок")
+    """
+    Показать список покупок в виде инлайн кнопок
 
-    # Всегда загружаем свежие данные
+    :param message: Входящее сообщение
+    :type message: types.Message
+    """
+    logger.info(
+        f"Пользователь {message.from_user.id} "
+        f"({message.from_user.username}) запросил список покупок"
+    )
     cards = await get_shopping_cards()
 
     if cards is None:
@@ -61,7 +73,19 @@ async def list_handler(message: types.Message) -> None:
 async def back_to_list_handler(
     callback: types.CallbackQuery, callback_data: CardCallback
 ) -> None:
-    """Вернуться к списку карточек"""
-    del callback_data
-    await callback.answer()
-    await list_handler(callback.message)
+    """
+    Вернуться к списку карточек
+
+    :param callback: Callback запрос
+    :type callback: types.CallbackQuery
+    :param callback_data: Данные callback
+    :type callback_data: CardCallback
+    """
+    try:
+        del callback_data
+        await callback.answer()
+        await list_handler(callback.message)
+
+    except Exception as error:
+        logger.error(f"Ошибка в back_to_list_handler: {error}")
+        await callback.answer("❌ Ошибка возврата к списку")

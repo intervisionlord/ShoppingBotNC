@@ -10,17 +10,13 @@ from handlers.handler_logging import logger
 # Инициализация бота
 BOT_INSTANCE = Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
 dispatcher = Dispatcher()
-
-# Главный роутер
 dispatcher.include_router(nc_deck_router)
 
 logger.info("Бот списка покупок инициализирован")
 
 
 async def process_update(update_data: dict) -> None:
-    """
-    Обработка обновления от Telegram
-    """
+    """Обработка обновления от Telegram"""
     if not BOT_INSTANCE:
         logger.warning("Получено обновление, но бот не инициализирован")
         return
@@ -30,9 +26,7 @@ async def process_update(update_data: dict) -> None:
 
 
 async def setup_webhook(webhook_url: str) -> None:
-    """
-    Настройка вебхука
-    """
+    """Настройка вебхука"""
     if not BOT_INSTANCE:
         logger.warning("Попытка настроить вебхук без бота")
         return
@@ -43,8 +37,6 @@ async def setup_webhook(webhook_url: str) -> None:
 
 
 async def close_bot_session() -> None:
-    """
-    Закрытие сессии бота
-    """
+    """Закрытие сессии бота"""
     if BOT_INSTANCE:
         await BOT_INSTANCE.session.close()
