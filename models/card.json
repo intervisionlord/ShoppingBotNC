@@ -1,0 +1,36 @@
+{
+    "id": 28,
+    "title": "Закупки",
+    "boardId": 9,
+    "deletedAt": 0,
+    "lastModified": 1761799616,
+    "cards": [
+        {
+            "id": 183,
+            "title": "Тестовый список покупок",
+            "description": "- [] 1",
+            "stackId": 28,
+            "type": "plain",
+            "lastModified": 1761799616,
+            "lastEditor": None,
+            "createdAt": 1761766670,
+            "labels": None,
+            "assignedUsers": [],
+            "attachments": None,
+            "attachmentCount": 0,
+            "owner": "intervision",
+            "order": 999,
+            "archived": False,
+            "done": None,
+            "duedate": None,
+            "deletedAt": 0,
+            "commentsUnread": 0,
+            "commentsCount": 0,
+            "ETag": "3379c796c6370efa760b93e6175a755c",
+            "overdue": 0,
+            "referenceData": None
+        }
+    ],
+    "order": 2,
+    "ETag": "3379c796c6370efa760b93e6175a755c"
+}

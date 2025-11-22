@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Request
 
-from handlers.handler_bot import process_update
+from handlers.handler_bot import bot
 from handlers.handler_logging import logger
 
 webhook_router = APIRouter(tags=["webhook"])
@@ -14,7 +14,7 @@ async def telegram_webhook(update: Request):
     """Ручка для вебхука Telegram"""
     try:
         update_data = await update.json()
-        await process_update(update_data)
+        await bot.process_update(update_data)
         return {"ok": True}
     except Exception as e:
         logger.error(f"Ошибка обработки вебхука: {e}")

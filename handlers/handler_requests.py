@@ -1,6 +1,7 @@
 """Обработчик отправки запросов к серверу NextCloud"""
 
 from typing import Any, Dict, Optional
+
 from httpx import AsyncClient, BasicAuth, HTTPStatusError, RequestError
 
 from config.settings import settings
@@ -13,7 +14,10 @@ headers = {
     "accept": "application/json",
     "Content-Type": "application/json",
 }
-auth = BasicAuth(username=settings.NC_LOGIN, password=settings.NC_PASSWORD)
+auth = BasicAuth(
+    username=settings.NC_LOGIN,
+    password=settings.NC_PASSWORD,
+)
 
 
 async def send_request(
@@ -35,7 +39,7 @@ async def send_request(
         logger.error("Не определен URL!")
         return None
 
-    async with AsyncClient(auth=auth, headers=headers, timeout=30.0) as client:
+    async with AsyncClient(auth=auth, headers=headers, timeout=TIMEOUT) as client:
         try:
             method_upper = method.upper()
             match method_upper:
@@ -51,5 +55,5 @@ async def send_request(
             response.raise_for_status()
             return response.json()
         except (RequestError, HTTPStatusError) as error:
-            logger.error(f'Ошибка запроса к "{url}" : {error}')
+            logger.error(f'Ошибка запроса к "{url}": {error}')
         return None
