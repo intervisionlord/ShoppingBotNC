@@ -78,7 +78,7 @@ class ModelCard(BaseModel):
 
     def update_list_items(self, items: List[str]) -> str:
         """
-        Обновить элементы списка в формате задач
+        Обновить элементы списка в формате задач, сохраняя состояние выполненных элементов
 
         :param items: Список элементов для добавления
         :type items: List[str]
@@ -88,10 +88,85 @@ class ModelCard(BaseModel):
         if not items:
             return ""
 
-        list_lines = []
-        CHECKBOX_TEMPLATE = "- [ ] {item}"
+        # Создаем словарь для отслеживания состояния элементов
+        item_states = {}
 
+        # Парсим текущее описание, чтобы сохранить состояния
+        if self.description:
+            lines = self.description.split("\n")
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+
+                # Определяем состояние элемента
+                if line.startswith("- [x] "):
+                    item_text = line[6:].strip()
+                    item_states[item_text] = "checked"
+                elif line.startswith("- [ ] "):
+                    item_text = line[6:].strip()
+                    item_states[item_text] = "unchecked"
+                elif line.startswith("- "):
+                    item_text = line[2:].strip()
+                    item_states[item_text] = "unchecked"
+                elif line.startswith("* "):
+                    item_text = line[2:].strip()
+                    item_states[item_text] = "unchecked"
+                elif line[0].isdigit() and ". " in line:
+                    item_text = line.split(". ", 1)[1].strip()
+                    item_states[item_text] = "unchecked"
+                else:
+                    item_text = line.strip()
+                    item_states[item_text] = "unchecked"
+
+        # Создаем новые строки с сохранением состояний
+        list_lines = []
         for item in items:
-            list_lines.append(CHECKBOX_TEMPLATE.format(item=item))
+            # Используем сохраненное состояние или создаем новый unchecked элемент
+            state = item_states.get(item, "unchecked")
+            if state == "checked":
+                list_lines.append(f"- [x] {item}")
+            else:
+                list_lines.append(f"- [ ] {item}")
 
         return "\n".join(list_lines)
+
+    def get_list_items_with_states(self) -> List[dict]:
+        """
+        Получить элементы списка с их состояниями
+
+        :return: Список словарей с элементами и их состояниями
+        :rtype: List[dict]
+        """
+        if not self.description:
+            return []
+
+        items = []
+        lines = self.description.split("\n")
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            # Определяем состояние элемента
+            if line.startswith("- [x] "):
+                item_text = line[6:].strip()
+                items.append({"text": item_text, "checked": True})
+            elif line.startswith("- [ ] "):
+                item_text = line[6:].strip()
+                items.append({"text": item_text, "checked": False})
+            elif line.startswith("- "):
+                item_text = line[2:].strip()
+                items.append({"text": item_text, "checked": False})
+            elif line.startswith("* "):
+                item_text = line[2:].strip()
+                items.append({"text": item_text, "checked": False})
+            elif line[0].isdigit() and ". " in line:
+                item_text = line.split(". ", 1)[1].strip()
+                items.append({"text": item_text, "checked": False})
+            else:
+                item_text = line.strip()
+                items.append({"text": item_text, "checked": False})
+
+        return items

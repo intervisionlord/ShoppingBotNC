@@ -16,6 +16,9 @@ ELLIPSIS_LENGTH = 3
 # Простой кэш карточек на время сессии
 _card_cache = {}
 
+# Кэш для отслеживания активной карточки по пользователю
+_user_active_card = {}
+
 
 @view_router.callback_query(CardCallback.filter(F.action == "view"))
 async def view_card_handler(
@@ -43,6 +46,10 @@ async def view_card_handler(
 
     # Кэшируем карточку
     _card_cache[callback_data.card_id] = target_card
+
+    # Сохраняем активную карточку для пользователя
+    user_id = callback.from_user.id
+    _user_active_card[user_id] = callback_data.card_id
 
     await _show_card_view(callback.message, target_card)
     await callback.answer()
@@ -140,11 +147,21 @@ async def handle_message_input(message: types.Message) -> None:
 
     logger.info(f"Получено сообщение для добавления: {message.text}")
 
-    # Используем первую карточку из кэша или загружаем заново
-    if _card_cache:
-        # Берем первую карточку из кэша (самый частый случай - одна карточка)
+    # Получаем активную карточку для пользователя
+    user_id = message.from_user.id
+    active_card_id = _user_active_card.get(user_id)
+
+    if active_card_id and active_card_id in _card_cache:
+        # Используем активную карточку пользователя
+        target_card = _card_cache[active_card_id]
+        await _add_items_to_card(message, target_card)
+    elif _card_cache:
+        # Fallback - берем первую карточку из кэша
         target_card = next(iter(_card_cache.values()))
         await _add_items_to_card(message, target_card)
+        logger.warning(
+            f"Активная карточка не найдена для пользователя {user_id}, использована первая из кэша"
+        )
     else:
         # Fallback - загружаем карточки если кэш пуст
         cards = await get_shopping_cards()
@@ -153,6 +170,9 @@ async def handle_message_input(message: types.Message) -> None:
             return
         target_card = cards[0]
         await _add_items_to_card(message, target_card)
+        logger.warning(
+            f"Кэш пуст для пользователя {user_id}, использована первая карточка"
+        )
 
 
 async def _parse_new_items(text: str) -> list:
@@ -194,11 +214,22 @@ async def _add_items_to_card(message: types.Message, card) -> None:
 
     logger.info(f"Парсинг элементов: {new_items}")
 
-    current_items = card.get_list_items()
-    updated_items = current_items + new_items
-    new_description = card.update_list_items(updated_items)
+    # Получаем текущие элементы с их состояниями
+    current_items_with_states = card.get_list_items_with_states()
+    current_item_texts = [item["text"] for item in current_items_with_states]
 
-    logger.info(f"Обновление карточки {card.id}: {len(updated_items)} элементов")
+    # Добавляем только новые элементы (исключаем дубликаты)
+    for new_item in new_items:
+        if new_item not in current_item_texts:
+            current_items_with_states.append({"text": new_item, "checked": False})
+
+    # Создаем обновленный список текстов элементов для обновления
+    updated_item_texts = [item["text"] for item in current_items_with_states]
+
+    # Обновляем описание карточки
+    new_description = card.update_list_items(updated_item_texts)
+
+    logger.info(f"Обновление карточки {card.id}: {len(updated_item_texts)} элементов")
 
     success = await update_card_description(card.id, new_description)
 
@@ -221,3 +252,27 @@ async def get_cached_card(card_id: int):
     :return: Карточка из кэша или None
     """
     return _card_cache.get(card_id)
+
+
+def set_user_active_card(user_id: int, card_id: int) -> None:
+    """
+    Установить активную карточку для пользователя
+
+    :param user_id: ID пользователя
+    :type user_id: int
+    :param card_id: ID карточки
+    :type card_id: int
+    """
+    _user_active_card[user_id] = card_id
+
+
+def get_user_active_card(user_id: int) -> int:
+    """
+    Получить активную карточку пользователя
+
+    :param user_id: ID пользователя
+    :type user_id: int
+    :return: ID активной карточки или None
+    :rtype: int
+    """
+    return _user_active_card.get(user_id)
