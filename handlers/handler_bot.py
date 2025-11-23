@@ -1,44 +1,42 @@
+"""Основной хендлер бота"""
+
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
 from config.settings import settings
-from handlers.bot_routes.base_routes import base_router
+from handlers.bot_routes.routes_deck import nc_deck_router
 from handlers.handler_logging import logger
 
 # Инициализация бота
-bot = (  # pylint: disable=C0103:invalid-name
-    Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
-)
+BOT_INSTANCE = Bot(token=settings.BOT_TOKEN) if settings.BOT_TOKEN else None
 dispatcher = Dispatcher()
+dispatcher.include_router(nc_deck_router)
 
-# Регистрируем роутеры бота
-dispatcher.include_router(base_router)
-
-logger.info("Бот инициализирован")
+logger.info("Бот списка покупок инициализирован")
 
 
-async def process_update(update_data: dict):
+async def process_update(update_data: dict) -> None:
     """Обработка обновления от Telegram"""
-    if not bot:
+    if not BOT_INSTANCE:
         logger.warning("Получено обновление, но бот не инициализирован")
         return
 
     tg_update = Update(**update_data)
-    await dispatcher.feed_webhook_update(bot, tg_update)
+    await dispatcher.feed_webhook_update(BOT_INSTANCE, tg_update)
 
 
-async def setup_webhook(webhook_url: str):
+async def setup_webhook(webhook_url: str) -> None:
     """Настройка вебхука"""
-    if not bot:
+    if not BOT_INSTANCE:
         logger.warning("Попытка настроить вебхук без бота")
         return
 
-    await bot.delete_webhook()
-    await bot.set_webhook(webhook_url)
+    await BOT_INSTANCE.delete_webhook()
+    await BOT_INSTANCE.set_webhook(webhook_url)
     logger.info(f"Вебхук установлен: {webhook_url}")
 
 
-async def close_bot_session():
+async def close_bot_session() -> None:
     """Закрытие сессии бота"""
-    if bot:
-        await bot.session.close()
+    if BOT_INSTANCE:
+        await BOT_INSTANCE.session.close()

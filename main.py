@@ -1,3 +1,5 @@
+"""Точка входа приложения"""
+
 import os
 
 import uvicorn
@@ -6,18 +8,22 @@ from config.settings import settings
 from handlers.handler_logging import logger
 from handlers.handler_server import server_app
 
-if __name__ == "__main__":
-    logger.info(f"🚀 Сервер запускается (v.{settings.VERSION})")
+
+def main() -> None:
+    """
+    Основная функция запуска приложения
+    """
+    logger.info(f"🚀 Сервер запускается ({settings.VERSION})")
     logger.info(f"📍 Хост: {settings.HOST}, Порт: {settings.PORT}")
     logger.info(f"🌐 WEBHOOK_HOST: {settings.WEBHOOK_HOST or 'не установлен'}")
 
     ssl_keyfile = settings.SSL_KEY_PATH
     ssl_certfile = settings.SSL_CERT_PATH
-    SSL_ENABLED = False
+    ssl_enabled = False
 
     if settings.SSL_ENABLED:
         if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
-            SSL_ENABLED = True
+            ssl_enabled = True
             logger.success("🔐 SSL сертификаты найдены, запуск с HTTPS")
         else:
             logger.warning("⚠️ SSL сертификаты не найдены, запуск с HTTP")
@@ -28,6 +34,10 @@ if __name__ == "__main__":
         port=settings.PORT,
         log_level=settings.LOG_LEVEL,
         access_log=True,
-        ssl_keyfile=ssl_keyfile if SSL_ENABLED else None,
-        ssl_certfile=ssl_certfile if SSL_ENABLED else None,
+        ssl_keyfile=ssl_keyfile if ssl_enabled else None,
+        ssl_certfile=ssl_certfile if ssl_enabled else None,
     )
+
+
+if __name__ == "__main__":
+    main()

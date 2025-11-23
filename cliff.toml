@@ -16,7 +16,7 @@ body = """
     {% for commit in commits | unique(attribute="message") %}
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
-            {{ commit.message | upper_first }} ( {{ commit.id }} )\
+            {{ commit.message | upper_first }}\
             {% if commit.body | upper_first %}
                 {{ commit.body | indent(level=1, indent_str="\t", first=true) }}\
             {% endif %}

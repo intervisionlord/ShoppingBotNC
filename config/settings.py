@@ -1,5 +1,6 @@
-from typing import Optional
+"""Файл настроек приложения"""
 
+from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -7,31 +8,41 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Конфигурация приложения"""
 
-    VERSION: str = Field("0.0.1.0")
+    VERSION: str = "v.:0.0.3.0"
 
     # Токен бота Telegram
     BOT_TOKEN: Optional[str] = Field(None, description="Токен бота от @BotFather")
 
     # Настройки сервера
-    HOST: str = Field("0.0.0.0", description="Хост для запуска сервера")
-    PORT: int = Field(8443, description="Порт для запуска сервера")
+    HOST: str = "0.0.0.0"
+    PORT: int = 8443
 
     # SSL
-    SSL_ENABLED: bool = Field(False, description="Использование локального SSL")
-    SSL_KEY_PATH: Optional[str] = Field(None, description="Ключ сертификата")
-    SSL_CERT_PATH: Optional[str] = Field(None, description="Сертификат")
+    SSL_ENABLED: bool = False
+    SSL_KEY_PATH: Optional[str] = None
+    SSL_CERT_PATH: Optional[str] = None
 
-    # Настройки вебхука (опционально для продакшена)
-    WEBHOOK_HOST: Optional[str] = Field(None, description="Публичный URL для вебхука")
+    # Настройки вебхука
+    WEBHOOK_HOST: Optional[str] = None
+
+    # Настройки NextCloud Deck
+    NC_URL: Optional[str] = Field(None, description="Адрес Nextcloud")
+    NC_LOGIN: Optional[str] = Field(None, description="Логин Nextcloud")
+    NC_PASSWORD: Optional[str] = Field(None, description="Пароль Nextcloud")
+
+    # ID доски и стека для списка покупок
+    DECK_BOARD_ID: int = 1
+    DECK_STACK_ID: int = 1
 
     # Настройки логирования
-    LOG_LEVEL: str = Field("INFO", description="Уровень логирования")
+    LOG_LEVEL: str = "INFO"
 
     class Config:
+        """Конфигурация Pydantic"""
+
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
 
 
-# Создаем глобальный экземпляр настроек
 settings = Settings()
