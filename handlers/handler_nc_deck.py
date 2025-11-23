@@ -1,58 +1,91 @@
-"""Обработчик получения досок и данных в них"""
+"""Обработчик для работы с карточками списка покупок"""
 
 from typing import List, Optional
-
-from pydantic import ValidationError
-
 from config.settings import settings
 from handlers.handler_logging import logger
 from handlers.handler_requests import send_request
-from models.model_board import ModelBoard
-from models.model_stack import ModelStack
+from models.model_card import ModelCard
 
 DECK_ENDPOINT = "/apps/deck/api/v1.0/boards"
 
 
-async def get_boards() -> Optional[List[ModelBoard]]:
+async def get_shopping_cards() -> Optional[List[ModelCard]]:
     """
-    Получение всех Дэк
+    Получение карточек из стека списка покупок
 
-    :return: JSON со списком Дэк
-    :rtype: List[ModelBoard] | None
+    :return: Список карточек или None при ошибке
+    :rtype: Optional[List[ShoppingCard]]
     """
-    boards_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}"
-    decklist = await send_request(url=boards_endpoint, method="GET")
-    if decklist is not None:
+    base_url = f"{settings.NC_URL}{DECK_ENDPOINT}"
+    stacks_endpoint = f"{base_url}/{settings.DECK_BOARD_ID}/stacks"
+
+    stacks_data = await send_request(url=stacks_endpoint, method="GET")
+
+    if not stacks_data:
+        logger.error("Не удалось получить данные стеков")
+        return None
+
+    target_stack = next(
+        (stack for stack in stacks_data if stack.get("id") == settings.DECK_STACK_ID),
+        None,
+    )
+
+    if not target_stack:
+        logger.error(f"Стек {settings.DECK_STACK_ID} не найден")
+        return None
+
+    cards_data = target_stack.get("cards", [])
+    cards = []
+
+    for card_data in cards_data:
         try:
-            decks = [ModelBoard(**deck) for deck in decklist]
-            return decks
-        except ValidationError as err:
-            logger.critical(f"Получены невалидные данные: {err}")
-    else:
-        logger.critical("Данные по доскам не получены")
-    return None
+            shopping_card = ModelCard(
+                id=card_data.get("id", 0),
+                title=card_data.get("title", ""),
+                description=card_data.get("description"),
+                stack_id=card_data.get("stackId", 0),
+            )
+            cards.append(shopping_card)
+        except Exception as error:
+            logger.warning(
+                f"Ошибка преобразования карточки {card_data.get('id')}: {error}"
+            )
+            continue
+
+    logger.info(f"Успешно загружено {len(cards)} карточек")
+    return cards
 
 
-async def get_stacks(board_id: int) -> Optional[List[ModelStack]]:
+async def update_card_description(card_id: int, description: str) -> bool:
     """
-    Получение стеков в доске
+    Обновление описания карточки
 
-    :param board_id: ID доски
-    :type board_id: int
-    :return: Список стеков в доске
-    :rtype: List[ModelStack] | None
+    :param card_id: ID карточки для обновления
+    :type card_id: int
+    :param description: Новое описание карточки
+    :type description: str
+    :return: True если обновление успешно, иначе False
+    :rtype: bool
     """
-    if board_id is not None:
-        stacks_endpoint = f"{settings.NC_URL}{DECK_ENDPOINT}/{board_id}/stacks"
-        stacklist = await send_request(url=stacks_endpoint, method="GET")
-        if stacklist is not None:
-            try:
-                stacks = [ModelStack(**stack) for stack in stacklist]
-                return stacks
-            except ValidationError as err:
-                logger.critical(f"Получены невалидные данные: {err}")
-        else:
-            logger.critical("Данные по стекам не получены")
-    else:
-        logger.critical('"board_id" не задан')
-    return None
+    base_url = f"{settings.NC_URL}{DECK_ENDPOINT}"
+    card_endpoint = (
+        f"{base_url}/{settings.DECK_BOARD_ID}/stacks/"
+        f"{settings.DECK_STACK_ID}/cards/{card_id}"
+    )
+
+    # Получаем текущие данные карточки для сохранения всех полей
+    card_data = await send_request(url=card_endpoint, method="GET")
+    if not card_data:
+        logger.error(f"Не удалось получить данные карточки {card_id}")
+        return False
+
+    # Обновляем только описание, сохраняя остальные поля
+    update_data = {**card_data, "description": description}
+    result = await send_request(url=card_endpoint, method="PUT", data=update_data)
+
+    if result:
+        logger.info(f"Карточка {card_id} успешно обновлена")
+        return True
+
+    logger.error(f"Ошибка обновления карточки {card_id}")
+    return False
