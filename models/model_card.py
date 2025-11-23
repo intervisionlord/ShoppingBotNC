@@ -26,11 +26,11 @@ class ModelCard(BaseModel):
     @property
     def short_title(self) -> str:
         """Сокращенный заголовок для кнопок"""
-        MAX_TITLE_LENGTH = 30
-        ELLIPSIS_LENGTH = 3
+        max_title_length = 30
+        ellipsis_length = 3
 
-        if len(self.title) > MAX_TITLE_LENGTH:
-            return self.title[: MAX_TITLE_LENGTH - ELLIPSIS_LENGTH] + "..."
+        if len(self.title) > max_title_length:
+            return self.title[: max_title_length - ellipsis_length] + "..."
         return self.title
 
     def get_list_items(self) -> List[str]:
@@ -95,7 +95,6 @@ class ModelCard(BaseModel):
                 if not line:
                     continue
 
-                # Определяем состояние элемента с помощью match case
                 match line:
                     case line if line.startswith("- [x] "):
                         item_text = line[6:].strip()
@@ -141,7 +140,6 @@ class ModelCard(BaseModel):
             if not line:
                 continue
 
-            # Определяем состояние элемента с помощью match case
             match line:
                 case line if line.startswith("- [x] "):
                     item_text = line[6:].strip()

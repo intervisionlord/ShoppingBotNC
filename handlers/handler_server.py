@@ -46,7 +46,6 @@ async def lifespan(_: FastAPI):
     logger.info("Сервер остановлен")
 
 
-# Создаем приложение с lifespan
 app = create_application()
 app.router.lifespan_context = lifespan
 

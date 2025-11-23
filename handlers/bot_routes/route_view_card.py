@@ -69,13 +69,13 @@ async def _show_card_view(message: types.Message, card) -> None:
     for index, item in enumerate(items):
         description = card.description or ""
         lines = description.split("\n")
-        EMOJI_CHECKED = "✅"
-        EMOJI_UNCHECKED = "🔳"
+        emoji_checked = "✅"
+        emoji_unchecked = "🔘"
 
         emoji = (
-            EMOJI_CHECKED
+            emoji_checked
             if index < len(lines) and "[x]" in lines[index]
-            else EMOJI_UNCHECKED
+            else emoji_unchecked
         )
 
         display_item = item
@@ -184,16 +184,16 @@ async def _parse_new_items(text: str) -> list:
     :return: Список очищенных элементов
     :rtype: list
     """
-    ITEM_SEPARATOR = ","
+    item_separator = ","
 
     new_items_text = text.strip()
     if not new_items_text:
         return []
 
-    if ITEM_SEPARATOR in new_items_text:
+    if item_separator in new_items_text:
         return [
             item.strip()
-            for item in new_items_text.split(ITEM_SEPARATOR)
+            for item in new_items_text.split(item_separator)
             if item.strip()
         ]
     return [new_items_text]
@@ -213,20 +213,12 @@ async def _add_items_to_card(message: types.Message, card) -> None:
         return
 
     logger.info(f"Парсинг элементов: {new_items}")
-
-    # Получаем текущие элементы с их состояниями
     current_items_with_states = card.get_list_items_with_states()
     current_item_texts = [item["text"] for item in current_items_with_states]
-
-    # Добавляем только новые элементы (исключаем дубликаты)
     for new_item in new_items:
         if new_item not in current_item_texts:
             current_items_with_states.append({"text": new_item, "checked": False})
-
-    # Создаем обновленный список текстов элементов для обновления
     updated_item_texts = [item["text"] for item in current_items_with_states]
-
-    # Обновляем описание карточки
     new_description = card.update_list_items(updated_item_texts)
 
     logger.info(f"Обновление карточки {card.id}: {len(updated_item_texts)} элементов")
@@ -235,7 +227,6 @@ async def _add_items_to_card(message: types.Message, card) -> None:
 
     if success:
         await message.answer(f"✅ Добавлено {len(new_items)} элементов в '{card.title}'")
-        # Обновляем кэш
         card.description = new_description
         _card_cache[card.id] = card
         await list_handler(message)
