@@ -1,17 +1,16 @@
 """Логика редактирования элементов карточки"""
 
-from aiogram import Router, types, F
+from aiogram import F, Router, types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from handlers.handler_nc_deck import update_card_description
-from handlers.bot_routes.states import CardCallback
-from handlers.bot_routes.route_view_card import (
-    get_cached_card,
-    _show_card_view,
-)
 from handlers.bot_routes.route_list_cards import list_handler
-
-# from handlers.handler_logging import logger
+from handlers.bot_routes.route_view_card import (
+    _show_card_view,
+    get_cached_card,
+)
+from handlers.bot_routes.states import CardCallback
+from handlers.handler_logging import logger
+from handlers.handler_nc_deck import update_card_description
 
 edit_router = Router()
 
@@ -48,13 +47,15 @@ async def toggle_item_handler(
         success = await update_card_description(target_card.id, new_description)
 
         if success:
+            logger.success(f"Статус карочки {target_card.id} обновлен")
             await callback.answer("✅ Статус обновлен")
-            # Обновляем кэш и показываем обновленную карточку
             target_card.description = new_description
             await _show_card_view(callback.message, target_card)
         else:
+            logger.error(f"Статус карточки {target_card.id} не был обновлен")
             await callback.answer("❌ Ошибка обновления")
     else:
+        logger.error(f"Элемент карточки {target_card.id} не был найден")
         await callback.answer("❌ Элемент не найден")
 
 
