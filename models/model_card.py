@@ -60,21 +60,17 @@ class ModelCard(BaseModel):
 
     def _clean_list_item(self, line: str) -> Optional[str]:
         """Очистить элемент списка от маркеров"""
-        MARKER_CHECKBOX_UNCHECKED = "- [ ] "
-        MARKER_CHECKBOX_CHECKED = "- [x] "
-        MARKER_DASH = "- "
-        MARKER_ASTERISK = "* "
-
-        if line.startswith(MARKER_CHECKBOX_UNCHECKED) or line.startswith(
-            MARKER_CHECKBOX_CHECKED
-        ):
-            return line[6:].strip()  # Убираем "- [ ] " или "- [x] "
-        elif line.startswith(MARKER_DASH) or line.startswith(MARKER_ASTERISK):
-            return line[2:].strip()  # Убираем "- " или "* "
-        elif line[0].isdigit() and ". " in line:
-            return line.split(". ", 1)[1].strip()  # Убираем "1. "
-
-        return line.strip() if line.strip() else None
+        match line:
+            case line if line.startswith("- [ ] "):
+                return line[6:].strip()  # Убираем "- [ ] "
+            case line if line.startswith("- [x] "):
+                return line[6:].strip()  # Убираем "- [x] "
+            case line if line.startswith("- ") or line.startswith("* "):
+                return line[2:].strip()  # Убираем "- " или "* "
+            case line if line[0].isdigit() and ". " in line:
+                return line.split(". ", 1)[1].strip()  # Убираем "1. "
+            case _:
+                return line.strip() if line.strip() else None
 
     def update_list_items(self, items: List[str]) -> str:
         """
@@ -99,35 +95,31 @@ class ModelCard(BaseModel):
                 if not line:
                     continue
 
-                # Определяем состояние элемента
-                if line.startswith("- [x] "):
-                    item_text = line[6:].strip()
-                    item_states[item_text] = "checked"
-                elif line.startswith("- [ ] "):
-                    item_text = line[6:].strip()
-                    item_states[item_text] = "unchecked"
-                elif line.startswith("- "):
-                    item_text = line[2:].strip()
-                    item_states[item_text] = "unchecked"
-                elif line.startswith("* "):
-                    item_text = line[2:].strip()
-                    item_states[item_text] = "unchecked"
-                elif line[0].isdigit() and ". " in line:
-                    item_text = line.split(". ", 1)[1].strip()
-                    item_states[item_text] = "unchecked"
-                else:
-                    item_text = line.strip()
-                    item_states[item_text] = "unchecked"
+                # Определяем состояние элемента с помощью match case
+                match line:
+                    case line if line.startswith("- [x] "):
+                        item_text = line[6:].strip()
+                        item_states[item_text] = "checked"
+                    case line if line.startswith("- [ ] "):
+                        item_text = line[6:].strip()
+                        item_states[item_text] = "unchecked"
+                    case line if line.startswith("- ") or line.startswith("* "):
+                        item_text = line[2:].strip()
+                        item_states[item_text] = "unchecked"
+                    case line if line[0].isdigit() and ". " in line:
+                        item_text = line.split(". ", 1)[1].strip()
+                        item_states[item_text] = "unchecked"
+                    case _:
+                        item_text = line.strip()
+                        item_states[item_text] = "unchecked"
 
         # Создаем новые строки с сохранением состояний
         list_lines = []
         for item in items:
             # Используем сохраненное состояние или создаем новый unchecked элемент
             state = item_states.get(item, "unchecked")
-            if state == "checked":
-                list_lines.append(f"- [x] {item}")
-            else:
-                list_lines.append(f"- [ ] {item}")
+            checkbox = "- [x] " if state == "checked" else "- [ ] "
+            list_lines.append(f"{checkbox}{item}")
 
         return "\n".join(list_lines)
 
@@ -149,24 +141,22 @@ class ModelCard(BaseModel):
             if not line:
                 continue
 
-            # Определяем состояние элемента
-            if line.startswith("- [x] "):
-                item_text = line[6:].strip()
-                items.append({"text": item_text, "checked": True})
-            elif line.startswith("- [ ] "):
-                item_text = line[6:].strip()
-                items.append({"text": item_text, "checked": False})
-            elif line.startswith("- "):
-                item_text = line[2:].strip()
-                items.append({"text": item_text, "checked": False})
-            elif line.startswith("* "):
-                item_text = line[2:].strip()
-                items.append({"text": item_text, "checked": False})
-            elif line[0].isdigit() and ". " in line:
-                item_text = line.split(". ", 1)[1].strip()
-                items.append({"text": item_text, "checked": False})
-            else:
-                item_text = line.strip()
-                items.append({"text": item_text, "checked": False})
+            # Определяем состояние элемента с помощью match case
+            match line:
+                case line if line.startswith("- [x] "):
+                    item_text = line[6:].strip()
+                    items.append({"text": item_text, "checked": True})
+                case line if line.startswith("- [ ] "):
+                    item_text = line[6:].strip()
+                    items.append({"text": item_text, "checked": False})
+                case line if line.startswith("- ") or line.startswith("* "):
+                    item_text = line[2:].strip()
+                    items.append({"text": item_text, "checked": False})
+                case line if line[0].isdigit() and ". " in line:
+                    item_text = line.split(". ", 1)[1].strip()
+                    items.append({"text": item_text, "checked": False})
+                case _:
+                    item_text = line.strip()
+                    items.append({"text": item_text, "checked": False})
 
         return items

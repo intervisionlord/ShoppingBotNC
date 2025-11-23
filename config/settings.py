@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Конфигурация приложения"""
 
-    VERSION: str = "0.0.3.0"
+    VERSION: str = "v.:0.0.3.0"
 
     # Токен бота Telegram
     BOT_TOKEN: Optional[str] = Field(None, description="Токен бота от @BotFather")

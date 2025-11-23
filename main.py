@@ -13,7 +13,7 @@ def main() -> None:
     """
     Основная функция запуска приложения
     """
-    logger.info(f"🚀 Сервер запускается (v.{settings.VERSION})")
+    logger.info(f"🚀 Сервер запускается ({settings.VERSION})")
     logger.info(f"📍 Хост: {settings.HOST}, Порт: {settings.PORT}")
     logger.info(f"🌐 WEBHOOK_HOST: {settings.WEBHOOK_HOST or 'не установлен'}")
 
